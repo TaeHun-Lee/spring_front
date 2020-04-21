@@ -1,11 +1,16 @@
 import React from 'react';
-import SignUp from "./SignUp";
 import './App.css';
+import { Route } from 'react-router-dom';
+import SignSide from './SignSide';
+import Main from './Main';
 
 function App() {
   return (
     <div className="App">
-      <SignUp />
+      <Route exact path="/" component={SignSide}/>
+      <Route exact path="/SignIn" component={SignSide}/>
+      <Route exact path="/SignUp" component={SignSide}/>
+      <Route exact path="/Main" component={Main}/>
     </div>
   );
 }

@@ -1,21 +1,18 @@
 import React, {Component} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 import axios from 'axios';
+import { Link as RouterLink } from 'react-router-dom';
 
 const styles = theme =>( {
   paper: {
-    marginTop: theme.spacing(8),
+    margin: theme.spacing(8, 4),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -26,7 +23,7 @@ const styles = theme =>( {
   },
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(1),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
@@ -65,17 +62,24 @@ class SignUp extends Component {
     axios.post(springUrl, JSON.stringify(data), {
       headers : {
         'Content-Type' : 'application/json'
-      }
+      },
+      withCredentials : true,
     }).then(res=>{
-      alert(res.data.Message);
+      if(res.data.Message === "SignUp Success"){
+          this.props.history.push('/Main');
+      }
+      else if (res.data.Message === "Already Signed In"){
+          this.props.history.push('/Main');
+      }
+      else {
+          alert("가입 실패");
+      }
     })
   }
 
   render() {
     const { classes } = this.props;
     return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
@@ -149,14 +153,13 @@ class SignUp extends Component {
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link component={RouterLink} to="/SignIn" variant="body2">
                 이미 가입하셨나요? 로그인
               </Link>
             </Grid>
           </Grid>
         </form>
       </div>
-    </Container>
     )
   }
 }
