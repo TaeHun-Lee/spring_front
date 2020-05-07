@@ -3,7 +3,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import { Route, Switch } from 'react-router-dom';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 
@@ -28,18 +27,22 @@ const styles = (theme) => ({
   });
 
 class SignSide extends Component {
+
+  urlCheck = (url) => {
+    if(url === "/signUp")
+      return(<SignUp history={this.props.history} __authInstanceCheck={this.props._authInstanceCheck} />);
+    else
+      return(<SignIn history={this.props.history} __authInstanceCheck={this.props._authInstanceCheck} />);
+  };
+
     render(){
         const { classes } = this.props;
         return (
-            <Grid container component="main" className={classes.root}>
+            <Grid container className={classes.root}>
                 <CssBaseline />
                 <Grid item xs={false} sm={4} md={7} className={classes.image} />
                 <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <Switch>
-                        <Route exact path="/" component={SignIn}/>
-                        <Route exact path="/SignIn" component={SignIn}/>
-                        <Route exact path="/SignUp" component={SignUp}/>
-                    </Switch>
+                  {this.urlCheck(this.props.url)}
                 </Grid>
             </Grid>
         );

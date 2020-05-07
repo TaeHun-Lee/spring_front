@@ -30,17 +30,16 @@ const styles = theme =>( {
   },
 });
 
-const springUrl = "http://localhost:8080/testProject/user/userSignUp";
+const springUrl = "http://localhost:8090/spring/user/";
 
 
 class SignUp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userId : '',
+      userName : '',
       userPw : '',
       userEmail : '',
-      userAdd : '',
     }
   }
 
@@ -52,29 +51,40 @@ class SignUp extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    let data = {
-      userId : this.state.userId,
+    const data = {
+      userName : this.state.userName,
       userPw : this.state.userPw,
       userEmail : this.state.userEmail,
-      userAdd : this.state.userAdd
     }
-    console.log(JSON.stringify(data));
-    axios.post(springUrl, JSON.stringify(data), {
+    axios.post(springUrl+"userSignUp/", data, {
       headers : {
         'Content-Type' : 'application/json'
       },
       withCredentials : true,
     }).then(res=>{
-      if(res.data.Message === "SignUp Success"){
-          this.props.history.push('/Main');
+      if (res.data.AUTH === "Already Signed In"){
+        alert("로그인 상태입니다. 로그아웃 처리 합니다.");
+        this.props.__authInstanceCheck();
+        axios.get(springUrl + "userSignOut/", {
+          withCredentials : true,
+        }).then(res=>{
+          if(res.data.Message === "SignOut Success"){
+            this.props.history.push("/");
+          }
+        })
       }
-      else if (res.data.Message === "Already Signed In"){
-          this.props.history.push('/Main');
+      else if(res.data.AUTH){
+        let tk = res.data.AUTH;
+        if(tk === "ADMIN")
+          tk = {tk};
+          tk = JSON.stringify(tk);
+        this.props.__authInstanceCheck(tk);
+        this.props.history.push("/");
       }
       else {
           alert("가입 실패");
       }
-    })
+    });
   }
 
   render() {
@@ -91,14 +101,14 @@ class SignUp extends Component {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                name="userId"
+                name="userName"
                 variant="outlined"
                 required
                 fullWidth
-                id="userId"
+                id="userName"
                 label="ID"
                 autoFocus
-                value={this.state.userId}
+                value={this.state.userName}
                 onChange={this.handleChange}
               />
             </Grid>
@@ -122,22 +132,10 @@ class SignUp extends Component {
                 required
                 fullWidth
                 id="userEmail"
-                label="이메일 주소"
+                label="이메일"
                 name="userEmail"
                 autoComplete="email"
                 value={this.state.userEmail}
-                onChange={this.handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="userAdd"
-                label="주소"
-                id="userAdd"
-                value={this.state.userAdd}
                 onChange={this.handleChange}
               />
             </Grid>
@@ -153,7 +151,7 @@ class SignUp extends Component {
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link component={RouterLink} to="/SignIn" variant="body2">
+              <Link component={RouterLink} to="/signIn" variant="body2">
                 이미 가입하셨나요? 로그인
               </Link>
             </Grid>
